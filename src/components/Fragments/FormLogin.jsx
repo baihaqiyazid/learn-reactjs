@@ -1,6 +1,5 @@
 import InputForm from "../Elements/Input";
 import Button from '../Elements/Button';
-import { Link } from 'react-router-dom';
 
 const FormLogin = () => {
     return (
@@ -20,15 +19,6 @@ const FormLogin = () => {
                 />
                 <Button className="bg-blue-600 w-full">Login</Button>
             </form>
-
-            <div className="text-center mt-4">
-                <p className="text-sm text-gray-600">
-                    Don't have an account?{" "}
-                    <Link to="/register" className="text-blue-500 hover:underline">
-                        Signup 
-                    </Link>
-                </p>
-            </div>
         </div>
     );
 }
