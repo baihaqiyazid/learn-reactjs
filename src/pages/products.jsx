@@ -1,6 +1,6 @@
 import CardProduct from "../components/Fragments/CardProduct";
 import Button from "../components/Elements/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const products =[
     {
@@ -40,6 +40,24 @@ const products =[
 const ProductPage = () => {
 
     const [carts, setCart] = useState([])
+
+    const [total, setTotalPrice] = useState(0)
+    
+    useEffect(() => {
+        setCart(JSON.parse(localStorage.getItem('carts')) || [])
+    }, [])
+
+    useEffect(()=> {
+        if(carts.length > 0){
+            const sum = carts.reduce((total, item) => {
+                const product = products.find(product => product.id === item.id)
+                return total + product.price * item.qty
+            }, 0)
+            setTotalPrice(sum)
+            localStorage.setItem('carts', JSON.stringify(carts))
+        }
+
+    }, [carts])
 
     const handleAddToCart = (id) => {
        if (carts.find((item) => item.id === id)) {
@@ -133,11 +151,12 @@ const ProductPage = () => {
 
                             })
                         }
+                        <tr>
+                            <td colSpan={3} className="border px-4 py-2 font-bold">Total</td>
+                            <td className="border px-4 py-2 font-bold">{total.toLocaleString()}</td>
+                        </tr>
                     </tbody>
                    </table>
-                   <div className="border px-4 py-2">
-                       Total: {carts.reduce((total, cart) => total + (products.find(product => product.id === cart.id).price * cart.qty), 0).toLocaleString()}
-                   </div>
                 </div>
             </div>
         </>
