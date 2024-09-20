@@ -26,9 +26,9 @@ const Body = (props) => {
     const {title, children} = props
     return (
         <div className="p-4">
-            <h3 className="text-lg font-bold text-gray-800">{title}</h3>
+            <h3 className="text-lg font-bold text-gray-800">{title.length > 30 ? title.substring(0, 20) + "..." : title}</h3>
             <p className="text-gray-600 mt-2 text-justify">
-               {children}
+               {children.length > 100 ? children.substring(0, 100) + "..." : children}
             </p>
         </div>
     );
@@ -39,7 +39,7 @@ const Footer = (props) => {
     return (
         <div className="p-4 flex items-center justify-between">
             <div className="text-lg font-semibold text-blue-600">
-                Rp. {price}
+                $ {price}
             </div>
             <Button className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline" 
                 onClick={()=> handleAddToCart(id)}>

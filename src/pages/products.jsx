@@ -1,54 +1,31 @@
 import CardProduct from "../components/Fragments/CardProduct";
 import Button from "../components/Elements/Button";
-import { useState, useEffect } from "react";
-
-const products =[
-    {
-        id: 1,
-        image: "../../public/images/shoes.jpg",
-        alt: "shoes",
-        description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum excepturi facere repellendus itaque veniam reiciendis maxime architecto? Magnam corporis cum voluptate eos iusto, placeat fugit quasi autem vitae laborum quia!",
-        title: "Flat Shoes",
-        price: 100000
-    },
-    {
-        id: 2,
-        image: "../../public/images/shoes.jpg",
-        alt: "shoes",
-        title: "Vans",
-        price: 200000,
-        description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum excepturi facere repellendus itaque veniam reiciendis maxime architecto? Magnam corporis cum voluptate eos iusto, placeat fugit quasi autem vitae laborum quia!",
-    },
-    {
-        id: 3,
-        image: "../../public/images/shoes.jpg",
-        alt: "shoes",
-        title: "Adidas",
-        description : "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum excepturi facere repellendus itaque veniam reiciendis maxime architecto? Magnam corporis cum voluptate eos iusto, placeat fugit quasi autem vitae laborum quia!",
-        price: 300000
-    },
-    {
-        id: 4,
-        image: "../../public/images/shoes.jpg",
-        alt: "shoes",
-        title: "Nike",
-        description : "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum excepturi facere repellendus itaque veniam reiciendis maxime architecto? Magnam corporis cum voluptate eos iusto, placeat fugit quasi autem vitae laborum quia!",
-        price: 400000
-    },
-]
+import { useState, useEffect, useRef } from "react";
+import { getAllProduct } from "../services/product.JSX";
 
 const ProductPage = () => {
 
     const [carts, setCart] = useState([])
-
+ 
     const [total, setTotalPrice] = useState(0)
-    
+    const [products, setProducts] = useState([])
+    const totalElement = useRef()
+
     useEffect(() => {
+        getAllProduct((error, data) => {
+            if(!error){
+                setProducts(data)
+            }else{
+                console.log(error);
+            }
+        })
+
         setCart(JSON.parse(localStorage.getItem('carts')) || [])
     }, [])
 
+
     useEffect(()=> {
-        if(carts.length > 0){
+        if(products.length > 0 && carts.length > 0){
             const sum = carts.reduce((total, item) => {
                 const product = products.find(product => product.id === item.id)
                 return total + product.price * item.qty
@@ -57,10 +34,16 @@ const ProductPage = () => {
             localStorage.setItem('carts', JSON.stringify(carts))
         }
 
-    }, [carts])
+        if(carts.length > 0){
+            totalElement.current.style.display = "table-row"
+        }else {
+            totalElement.current.style.display = "none"
+        }
+
+    }, [carts, products])
 
     const handleAddToCart = (id) => {
-       if (carts.find((item) => item.id === id)) {
+       if (products.length > 0 && carts.find((item) => item.id === id)) {
             setCart(
                 carts.map((item) => {
                     if (item.id === id) {
@@ -111,7 +94,7 @@ const ProductPage = () => {
         </nav>
             <div className="flex justify-center mx-4">
                 <div className="w-3/4 flex flex-wrap">
-                {products.map((product, index) => (
+                {products.length > 0 && products.map((product, index) => (
                     <CardProduct key={product.id}>
                     <CardProduct.Header image={product.image} alt={product.alt} />
                     <CardProduct.Body title={product.title}>
@@ -132,18 +115,18 @@ const ProductPage = () => {
                         <tr>
                             <th className="border px-2 py-2 font-medium">Product</th>
                             <th className="border px-2 py-2 font-medium">Price</th>
-                            <th className="border px-2 py-2 font-medium">Quantity</th>
+                            <th className="border px-2 py-2 font-medium">Qty</th>
                             <th className="border px-2 py-2 font-medium">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
-                            carts.map((cart) => {
+                           products.length > 0 && carts.map((cart) => {
                                 const product = products.find(product => product.id === cart.id)
                                 return (
                                     <tr key={cart.id}>
-                                        <td className="border px-4 py-2">{product.title}</td>
-                                        <td className="border px-4 py-2">{product.price.toLocaleString()}</td>
+                                        <td className="border px-4 py-2">{product.title.substring(0, 30)}</td>
+                                        <td className="border px-4 py-2">$ {product.price.toLocaleString()}</td>
                                         <td className="border px-4 py-2">{cart.qty}</td>
                                         <td className="border px-4 py-2">{(product.price * cart.qty).toLocaleString()}</td>
                                     </tr>
@@ -151,7 +134,7 @@ const ProductPage = () => {
 
                             })
                         }
-                        <tr>
+                        <tr ref={totalElement}>
                             <td colSpan={3} className="border px-4 py-2 font-bold">Total</td>
                             <td className="border px-4 py-2 font-bold">{total.toLocaleString()}</td>
                         </tr>
