@@ -3,24 +3,17 @@ import Button from "../components/Elements/Button";
 import { useState, useEffect, useRef } from "react";
 import { getAllProduct } from "../services/productService.jsx";
 import { getUsername } from "../services/authService.jsx";
+import { useLogin } from "../hooks/useLogin.jsx";
 
 const ProductPage = () => {
 
     const [carts, setCart] = useState([])
-    const [username, setUsername] = useState(null)
- 
     const [total, setTotalPrice] = useState(0)
     const [products, setProducts] = useState([])
     const totalElement = useRef()
+    const username = useLogin()
 
     useEffect(() => {
-        const token = localStorage.getItem('token')
-        if(token){
-            setUsername(getUsername(token))
-        }else{
-            window.location.href = '/login'
-        }
-
         getAllProduct((error, data) => {
             if(!error){
                 setProducts(data)
@@ -70,10 +63,7 @@ const ProductPage = () => {
     }
 
     const handleLogout = () => {
-        console.log("Logout");
-        
-        localStorage.removeItem('email')
-        localStorage.removeItem('password')
+        localStorage.removeItem('token')
         window.location.href = '/login'
     }
     return (
@@ -96,7 +86,7 @@ const ProductPage = () => {
 
                     {/* Button */}
                     <div className="flex items-center">
-                       <p className="text-white text-lg mr-5">{username}</p>    
+                       <button className="text-white text-lg mr-5" onClick={() => window.location.href = '/profile'}>{username}</button>    
                        <Button className="bg-black" onClick={handleLogout}>Logout</Button>
                     </div>
                 </div>
