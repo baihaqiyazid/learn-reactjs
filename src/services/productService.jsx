@@ -13,3 +13,19 @@ export const getAllProduct = (callback) => {
         }
     });
 };
+
+export const getProductById = (id, callback) => {
+    axios.get("https://fakestoreapi.com/products/" + id)
+    .then((response) => {
+        if (callback) {
+            console.log(response.data);
+            callback(null, response.data);
+        }
+    })
+    .catch((error) => {
+        if (callback) {
+            console.log(error);
+            callback(error, null);
+        }
+    });
+};
