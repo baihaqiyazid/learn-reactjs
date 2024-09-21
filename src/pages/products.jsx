@@ -1,17 +1,26 @@
 import CardProduct from "../components/Fragments/CardProduct";
 import Button from "../components/Elements/Button";
 import { useState, useEffect, useRef } from "react";
-import { getAllProduct } from "../services/product.JSX";
+import { getAllProduct } from "../services/productService.jsx";
+import { getUsername } from "../services/authService.jsx";
 
 const ProductPage = () => {
 
     const [carts, setCart] = useState([])
+    const [username, setUsername] = useState(null)
  
     const [total, setTotalPrice] = useState(0)
     const [products, setProducts] = useState([])
     const totalElement = useRef()
 
     useEffect(() => {
+        const token = localStorage.getItem('token')
+        if(token){
+            setUsername(getUsername(token))
+        }else{
+            window.location.href = '/login'
+        }
+
         getAllProduct((error, data) => {
             if(!error){
                 setProducts(data)
@@ -86,7 +95,8 @@ const ProductPage = () => {
                     </div>
 
                     {/* Button */}
-                    <div className="hidden md:block">
+                    <div className="flex items-center">
+                       <p className="text-white text-lg mr-5">{username}</p>    
                        <Button className="bg-black" onClick={handleLogout}>Logout</Button>
                     </div>
                 </div>

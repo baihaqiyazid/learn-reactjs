@@ -1,31 +1,47 @@
 import InputForm from "../Elements/Input";
 import Button from '../Elements/Button';
-import { useEffect, useRef } from "react";
-
-
+import { useEffect, useRef, useState } from "react";
+import { login } from "../../services/authService";
+import Loading from "../Elements/Loading";
 
 const FormLogin = () => {
-    const emailRef = useRef()
+
+    const [loginFailed, setLoginFailed] = useState(null)
+    const [loading, setLoading] = useState(false)
+
+    const usernameRef = useRef()
     const handleLogin = (event) => {
         event.preventDefault()
-        localStorage.setItem('email', event.target.email.value)
-        localStorage.setItem('password', event.target.password.value)
-        window.location.href = '/products'
+        setLoading(true)
+        const data = {
+            username: event.target.username.value,
+            password: event.target.password.value,
+        }
+        login(data, (error, token) => {
+            setLoading(false)
+            if (error) {
+                setLoginFailed(error)
+            } else {
+                localStorage.setItem('token', token)
+                window.location.href = '/products'
+            }
+        })
     }
 
     useEffect(() => {
-        emailRef.current.focus()
-    },[])
+        usernameRef.current.focus()
+    }, [])
 
     return (
         <div>
             <form onSubmit={handleLogin}>
                 <InputForm
-                    label="Email"
-                    type="email"
-                    placeholder="enter your email"
-                    name="email"
-                    ref = {emailRef}
+                    required
+                    label="Username"
+                    type="text"
+                    placeholder="John Doe"
+                    name="username"
+                    ref={usernameRef}
                 />
                 <InputForm
                     label="Password"
@@ -33,7 +49,13 @@ const FormLogin = () => {
                     placeholder="********"
                     name="password"
                 />
-                <Button className="bg-blue-600 w-full" type="submit">Login</Button>
+                <Button className="bg-blue-600 w-full" type="submit">
+                    {loading && <Loading />}
+                    {loading === false && "Login"} 
+                    
+                </Button>
+
+                {loginFailed && <p className="text-red-500 text-center mt-5">{loginFailed}</p>}
             </form>
         </div>
     );
